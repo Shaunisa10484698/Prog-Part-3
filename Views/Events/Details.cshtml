@@ -1,0 +1,32 @@
+﻿@model RaceDayWeb.Models.Event
+@using Microsoft.AspNetCore.Http
+<h2>@Model.Name</h2>
+<p>@Model.Description</p>
+<p><b>Date:</b> @Model.Date.ToString("dd MMM yyyy") | <b>Location:</b> @Model.Location | <b>Distance:</b> @Model.Distance km | <b>Type:</b> @Model.EventType</p>
+
+@if (Context.Session.GetString("Role") == "Participant")
+{
+    <a asp-controller="Enrolments" asp-action="Enrol" asp-route-eventId="@Model.Id" class="btn btn-success">Enrol in this Event</a>
+}
+@if (Context.Session.GetString("Role") == "Organiser")
+{
+    <a asp-controller="Enrolments" asp-action="ByEvent" asp-route-eventId="@Model.Id" class="btn btn-info">View Enrolments</a>
+    <a asp-controller="Results" asp-action="Create" asp-route-eventId="@Model.Id" class="btn btn-warning">Add Result</a>
+    <a asp-controller="Categories" asp-action="Create" asp-route-eventId="@Model.Id" class="btn btn-secondary">Add Category</a>
+}
+
+<h3 class="mt-4">Categories</h3>
+@foreach (var c in (List<RaceDayWeb.Models.Category>)ViewBag.Categories)
+{
+    <span class="badge bg-primary me-1">@c.Name</span>
+}
+
+<h3 class="mt-4">Results / Leaderboard</h3>
+<table class="table">
+    <tr><th>Position</th><th>Participant ID</th><th>Finish Time</th></tr>
+    @foreach (var r in (List<RaceDayWeb.Models.Result>)ViewBag.Results)
+    {
+        <tr><td>@r.Position</td><td>@r.ParticipantId</td><td>@r.FinishTime</td></tr>
+    }
+</table>
+<a asp-action="Index" class="btn btn-secondary">Back to Events</a>

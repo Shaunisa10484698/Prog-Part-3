@@ -1,0 +1,19 @@
+﻿@model List<RaceDayWeb.Models.Category>
+<h2>Enrol</h2>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<form asp-action="Enrol" method="post">
+    <input type="hidden" name="eventId" value="@ViewBag.EventId" />
+    <div class="mb-3">
+        <label>Choose Category</label>
+        <select name="categoryId" class="form-control">
+            @foreach (var c in Model)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+    </div>
+    <button class="btn btn-success">Confirm Enrolment</button>
+</form>

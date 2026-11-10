@@ -1,0 +1,21 @@
+﻿@model RaceDayWeb.Models.Event
+<h2>Create Event</h2>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<form asp-action="Create" method="post">
+    <div class="mb-3"><label>Name</label><input asp-for="Name" class="form-control" required /></div>
+    <div class="mb-3"><label>Description</label><textarea asp-for="Description" class="form-control"></textarea></div>
+    <div class="mb-3"><label>Date</label><input asp-for="Date" type="date" class="form-control" required /></div>
+    <div class="mb-3"><label>Location</label><input asp-for="Location" class="form-control" required /></div>
+    <div class="mb-3"><label>Distance (km)</label><input asp-for="Distance" type="number" step="0.1" class="form-control" /></div>
+    <div class="mb-3">
+        <label>Event Type</label>
+        <select asp-for="EventType" class="form-control"><option>5km</option><option>10km</option><option>21km</option><option>42km</option></select>
+    </div>
+
+    <div class="mb-3"><label>Banner Image</label><input type="file" name="banner" class="form-control" accept="image/*" /></div>
+
+    <button class="btn btn-success">Create</button>
+</form>

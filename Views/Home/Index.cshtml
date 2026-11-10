@@ -1,0 +1,25 @@
+﻿@model List<RaceDayWeb.Models.Event>
+<h1>🏃 RaceDay - Upcoming Events</h1>
+<p>Welcome to RaceDay! Find your next race, enrol and track your results.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No events yet. Organiser must create one.</div>
+}
+
+<div class="row">
+    @foreach (var e in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>@e.Name</h5>
+                    <p>@e.Description</p>
+                    <p><b>@e.Date.ToString("dd MMM yyyy")</b> - @e.Location</p>
+                    <p>@e.Distance km - @e.EventType</p>
+                    <a asp-controller="Events" asp-action="Details" asp-route-id="@e.Id" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

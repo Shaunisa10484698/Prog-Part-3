@@ -1,0 +1,9 @@
+﻿@model List<RaceDayWeb.Models.Enrolment>
+<h2>Enrolments for Event @ViewBag.EventId</h2>
+<table class="table">
+    <tr><th>Participant ID</th><th>Category ID</th><th>Date</th><th>Status</th></tr>
+    @foreach (var e in Model)
+    {
+        <tr><td>@e.ParticipantId</td><td>@e.CategoryId</td><td>@e.EnrolledDate.ToString("dd MMM yyyy")</td><td>@e.Status</td></tr>
+    }
+</table>

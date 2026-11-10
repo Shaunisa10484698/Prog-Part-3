@@ -1,0 +1,9 @@
+﻿@model List<RaceDayWeb.Models.Result>
+<h2>My Results</h2>
+<table class="table">
+    <tr><th>Event ID</th><th>Finish Time</th><th>Position</th></tr>
+    @foreach (var r in Model)
+    {
+        <tr><td>@r.EventId</td><td>@r.FinishTime</td><td>@r.Position</td></tr>
+    }
+</table>

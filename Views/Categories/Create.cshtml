@@ -1,0 +1,7 @@
+﻿@model RaceDayWeb.Models.Category
+<h2>Add Category</h2>
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="EventId" value="@ViewBag.EventId" />
+    <div class="mb-3"><label>Category Name (e.g. U18, Open, Masters)</label><input asp-for="Name" class="form-control" required /></div>
+    <button class="btn btn-success">Add Category</button>
+</form>

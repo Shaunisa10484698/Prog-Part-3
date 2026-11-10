@@ -1,103 +1,22 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RaceDayAPI.Data;
-using RaceDayAPI.Models;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
+using RaceDayWeb.Models;
+using RaceDayWeb.Services;
 
-namespace RaceDayAPI.Controllers;
+namespace RaceDayWeb.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class CategoriesController : ControllerBase
+public class CategoriesController : Controller
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ApiClient _api;
+    public CategoriesController(ApiClient api) => _api = api;
+    private string? Token => HttpContext.Session.GetString("Token");
 
-    public CategoriesController(ApplicationDbContext db)
-    {
-        _db = db;
-    }
-
-    // GET: api/Categories
     [HttpGet]
-    public async Task<ActionResult<List<Category>>> GetAll()
-    {
-        return await _db.Categories.ToListAsync();
-    }
+    public IActionResult Create(int eventId) { ViewBag.EventId = eventId; return View(); }
 
-    // GET: api/Categories/byEvent/5
-    [HttpGet("byEvent/{eventId}")]
-    public async Task<ActionResult<List<Category>>> GetByEvent(int eventId)
-    {
-        return await _db.Categories
-            .Where(c => c.EventId == eventId)
-            .ToListAsync();
-    }
-
-    // POST: api/Categories
-    [Authorize(Roles = "Organiser")]
     [HttpPost]
-    public async Task<ActionResult<Category>> Create(Category cat)
+    public async Task<IActionResult> Create(Category cat)
     {
-        var userIdClaim = User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-
-        if (!int.TryParse(userIdClaim, out int userId))
-            return Unauthorized();
-
-        var existingEvent = await _db.Events
-            .FindAsync(cat.EventId);
-
-        if (existingEvent == null)
-            return NotFound("Event not found");
-
-        if (existingEvent.OrganiserId != userId)
-            return Forbid();
-
-        _db.Categories.Add(cat);
-
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction(
-            nameof(GetByEvent),
-            new { eventId = cat.EventId },
-            cat
-        );
-    }
-
-    // DELETE: api/Categories/5
-    [Authorize(Roles = "Organiser")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var userIdClaim = User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-
-        if (!int.TryParse(userIdClaim, out int userId))
-            return Unauthorized();
-
-        var category = await _db.Categories
-            .FindAsync(id);
-
-        if (category == null)
-            return NotFound("Category not found");
-
-        var existingEvent = await _db.Events
-            .FindAsync(category.EventId);
-
-        if (existingEvent == null)
-            return NotFound("Event not found");
-
-        if (existingEvent.OrganiserId != userId)
-            return Forbid();
-
-        _db.Categories.Remove(category);
-
-        await _db.SaveChangesAsync();
-
-        return Ok("Category deleted successfully");
+        await _api.PostAsync("Categories", cat, Token);
+        return RedirectToAction("Details", "Events", new { id = cat.EventId });
     }
 }

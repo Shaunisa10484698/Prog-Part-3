@@ -1,0 +1,91 @@
+﻿@model List<RaceDayWeb.Models.Event>
+
+<h2>Organiser Dashboard</h2>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3>@ViewBag.TotalEvents</h3>
+            <p>Total Events</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3>@ViewBag.TotalEnrolments</h3>
+            <p>Total Enrolments</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3>Upcoming</h3>
+
+            @foreach (var e in (List<RaceDayWeb.Models.Event>)ViewBag.Upcoming)
+            {
+                <div>
+                    @e.Date.ToString("dd MMM yyyy") - @e.Name
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<table class="table mt-3">
+
+    <thead>
+        <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Enrolments</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td>@e.Name</td>
+
+                <td>@e.Date.ToString("dd MMM yyyy")</td>
+
+                <td>
+                    @(((Dictionary<int, int>)ViewBag.Counts)[e.Id])
+                </td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@e.Id"
+                       class="btn btn-sm btn-info">
+                        View
+                    </a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@e.Id"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@e.Id"
+                          method="post"
+                          style="display:inline">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this event?')">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+

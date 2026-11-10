@@ -1,0 +1,16 @@
+﻿@model RaceDayWeb.Models.User
+<h2>My Profile</h2>
+@if (!string.IsNullOrEmpty(Model.ProfilePicture))
+{
+    <img src="@Model.ProfilePicture" style="width:150px;height:150px;object-fit:cover;border-radius:50%" />
+}
+<form asp-action="Profile" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="PasswordHash" />
+    <input type="hidden" asp-for="Role" />
+    <input type="hidden" asp-for="ProfilePicture" />
+    <div class="mb-3"><label>Full Name</label><input asp-for="FullName" class="form-control" /></div>
+    <div class="mb-3"><label>Email</label><input asp-for="Email" class="form-control" /></div>
+    <div class="mb-3"><label>Profile Picture</label><input type="file" name="pic" class="form-control" accept="image/*" /></div>
+    <button class="btn btn-success">Update Profile</button>
+</form>

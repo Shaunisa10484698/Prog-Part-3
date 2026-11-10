@@ -1,0 +1,15 @@
+﻿@model List<RaceDayWeb.Models.Enrolment>
+<h2>My Enrolments</h2>
+<table class="table">
+    <tr><th>Event ID</th><th>Category ID</th><th>Date</th><th>Status</th><th></th></tr>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.EventId</td>
+            <td>@e.CategoryId</td>
+            <td>@e.EnrolledDate.ToString("dd MMM yyyy")</td>
+            <td>@e.Status</td>
+            <td><a asp-action="Cancel" asp-route-id="@e.Id" class="btn btn-sm btn-danger" onclick="return confirm('Cancel?')">Cancel</a></td>
+        </tr>
+    }
+</table>

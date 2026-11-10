@@ -1,0 +1,65 @@
+﻿@model List<RaceDayWeb.Models.Event>
+
+<h2>Events</h2>
+
+@if (Context.Session.GetString("Role") == "Organiser")
+{
+    <a asp-action="Create" class="btn btn-success mb-3">Create Event</a>
+    <a asp-action="Dashboard" class="btn btn-info mb-3">Dashboard</a>
+}
+
+<div class="row">
+    @foreach (var e in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(e.BannerImage))
+                {
+                    <img src="@e.BannerImage"
+                         class="card-img-top"
+                         style="height:180px;object-fit:cover" />
+                }
+
+                <div class="card-body">
+                    <h5>@e.Name</h5>
+
+                    <p>
+                        @e.Date.ToString("dd MMM yyyy") |
+                        @e.Location |
+                        @e.Distance km |
+                        @e.EventType
+                    </p>
+
+                    <a asp-action="Details"
+                       asp-route-id="@e.Id"
+                       class="btn btn-primary">
+                        View Details
+                    </a>
+
+                    @if (Context.Session.GetString("Role") == "Organiser")
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@e.Id"
+                           class="btn btn-warning">
+                            Edit
+                        </a>
+
+                        <form asp-action="Delete"
+                              asp-route-id="@e.Id"
+                              method="post"
+                              style="display:inline">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Delete this event?')">
+                                Delete
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

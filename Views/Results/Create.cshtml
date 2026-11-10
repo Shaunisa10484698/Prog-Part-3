@@ -1,0 +1,13 @@
+﻿@model RaceDayWeb.Models.Result
+<h2>Add Result</h2>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="EventId" value="@ViewBag.EventId" />
+    <div class="mb-3"><label>Participant ID</label><input asp-for="ParticipantId" type="number" class="form-control" required /></div>
+    <div class="mb-3"><label>Finish Time (e.g. 01:23:45)</label><input asp-for="FinishTime" class="form-control" required /></div>
+    <div class="mb-3"><label>Position</label><input asp-for="Position" type="number" class="form-control" required /></div>
+    <button class="btn btn-success">Save Result</button>
+</form>

@@ -1,73 +1,53 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RaceDayAPI.Data;
-using RaceDayAPI.Models;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
+using RaceDayWeb.Models;
+using RaceDayWeb.Services;
 
-namespace RaceDayAPI.Controllers;
+namespace RaceDayWeb.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-[Authorize]
-public class EnrolmentsController : ControllerBase
+public class EnrolmentsController : Controller
 {
-    private readonly ApplicationDbContext _db;
-    public EnrolmentsController(ApplicationDbContext db) => _db = db;
+    private readonly ApiClient _api;
+    public EnrolmentsController(ApiClient api) => _api = api;
+    private string? Token => HttpContext.Session.GetString("Token");
+    private string? Role => HttpContext.Session.GetString("Role");
 
-    // Participant enrols
-    [Authorize(Roles = "Participant")]
+    [HttpGet]
+    public async Task<IActionResult> Enrol(int eventId)
+    {
+        if (Role != "Participant") return RedirectToAction("Login", "Account");
+        var categories = await _api.GetAsync<List<Category>>($"Categories/byEvent/{eventId}") ?? new List<Category>();
+        ViewBag.EventId = eventId;
+        return View(categories);
+    }
+
     [HttpPost]
-    public async Task<ActionResult<Enrolment>> Enrol(Enrolment enrol)
+    public async Task<IActionResult> Enrol(int eventId, int categoryId)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        enrol.ParticipantId = userId;
-        enrol.EnrolledDate = DateTime.Now;
-
-        // Prevent double enrolment
-        if (await _db.Enrolments.AnyAsync(e => e.EventId == enrol.EventId && e.ParticipantId == userId))
-            return BadRequest("Already enrolled in this event");
-
-        _db.Enrolments.Add(enrol);
-        await _db.SaveChangesAsync();
-        return Ok(enrol);
+        var enrol = new Enrolment { EventId = eventId, CategoryId = categoryId, Status = "Confirmed", EnrolledDate = DateTime.Now };
+        var res = await _api.PostAsync("Enrolments", enrol, Token);
+        if (!res.IsSuccessStatusCode) ViewBag.Error = "Already enrolled or error";
+        else return RedirectToAction("My");
+        var categories = await _api.GetAsync<List<Category>>($"Categories/byEvent/{eventId}") ?? new List<Category>();
+        ViewBag.EventId = eventId;
+        return View(categories);
     }
 
-    // My enrolments - Participant
-    [HttpGet("my")]
-    public async Task<ActionResult<List<Enrolment>>> MyEnrolments()
+    public async Task<IActionResult> My()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return await _db.Enrolments.Where(e => e.ParticipantId == userId).ToListAsync();
+        var list = await _api.GetAsync<List<Enrolment>>("Enrolments/my", Token) ?? new List<Enrolment>();
+        return View(list);
     }
 
-    // All enrolments for an event - Organiser
-    [Authorize(Roles = "Organiser")]
-    [HttpGet("byEvent/{eventId}")]
-    public async Task<ActionResult<List<Enrolment>>> ByEvent(int eventId)
-        => await _db.Enrolments.Where(e => e.EventId == eventId).ToListAsync();
+    public async Task<IActionResult> ByEvent(int eventId)
+    {
+        var list = await _api.GetAsync<List<Enrolment>>($"Enrolments/byEvent/{eventId}", Token) ?? new List<Enrolment>();
+        ViewBag.EventId = eventId;
+        return View(list);
+    }
 
-
-    [Authorize(Roles = "Participant")]
-    [HttpDelete("{id}")]
     public async Task<IActionResult> Cancel(int id)
     {
-        var userId = int.Parse(
-            User.FindFirstValue(ClaimTypes.NameIdentifier)!
-        );
-
-        var enrolment = await _db.Enrolments
-            .FirstOrDefaultAsync(e =>
-                e.Id == id && e.ParticipantId == userId);
-
-        if (enrolment == null)
-            return NotFound("Enrolment not found");
-
-        _db.Enrolments.Remove(enrolment);
-
-        await _db.SaveChangesAsync();
-
-        return Ok("Enrolment cancelled successfully");
+        await _api.DeleteAsync($"Enrolments/{id}", Token);
+        return RedirectToAction("My");
     }
-
 }

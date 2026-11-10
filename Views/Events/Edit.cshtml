@@ -1,0 +1,21 @@
+﻿@model RaceDayWeb.Models.Event
+<h2>Edit Event</h2>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" /><input type="hidden" asp-for="OrganiserId" /><input type="hidden" asp-for="BannerImage" />
+    <div class="mb-3"><label>Name</label><input asp-for="Name" class="form-control" required /></div>
+    <div class="mb-3"><label>Description</label><textarea asp-for="Description" class="form-control"></textarea></div>
+    <div class="mb-3"><label>Date</label><input asp-for="Date" type="date" class="form-control" required /></div>
+    <div class="mb-3"><label>Location</label><input asp-for="Location" class="form-control" required /></div>
+    <div class="mb-3"><label>Distance km</label><input asp-for="Distance" class="form-control" required /></div>
+    <div class="mb-3"><label>Type</label><select asp-for="EventType" class="form-control"><option>5K</option><option>10K</option><option>Half Marathon</option><option>Marathon</option><option>Trail</option></select></div>
+    @if (!string.IsNullOrEmpty(Model.BannerImage))
+    {
+        <img src="@Model.BannerImage" style="max-width:300px" class="mb-2" />
+    }
+    <div class="mb-3"><label>Change Banner Image</label><input type="file" name="banner" class="form-control" accept="image/*" /></div>
+    <button class="btn btn-success">Save Changes</button>
+</form>
